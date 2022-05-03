@@ -16,7 +16,7 @@ class StreamReassembler {
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
     bool _eof{}; // 是否接收到EOF的标志
-    std::map<size_t, char> _unassembled_segments{}; // 利用map维护重组片段
+    std::map<size_t, std::string> _unassembled_segments{}; // 利用map维护重组片段
 
 
   public:
