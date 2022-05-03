@@ -30,7 +30,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         return;
     } else if (data_len == 0) { // 传入data为空时的加速处理
         _eof |= eof; // 处理为EOF的碎片
-        if (empty() && eof) {  
+        if (empty() && _eof) {  
             _output.end_input();
         }
         return;
@@ -53,25 +53,26 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         size_t overflow_bytes = index+data_len - first_unacceptable_index;
         substr_len = data_len-substr_begin_pos - overflow_bytes;
     }
-    string segment(data, substr_begin_pos, substr_len);
+    string segment = data.substr(substr_begin_pos, substr_len);
 
-    /* 利用map特性，合并重组子串 */
+    /* 利用unordered_map特性，合并重组子串 */
     size_t tmp_index = new_index;
-    for (auto it : segment) {
-        _unassembled_segments.emplace(tmp_index, it);
+    for (char it : segment) {
+        if (_unassembled_segments.count(tmp_index) == 0) 
+            _unassembled_segments.emplace(tmp_index, it);
         ++tmp_index;
     }
 
     /* push重组的片段到_output中 */ 
     string pushed_segment;
     if (new_index == first_unassembled_index) {
-        auto it = _unassembled_segments.begin();
-        while ((it != _unassembled_segments.end()) && (it->first == new_index)) {
+        auto it = _unassembled_segments.find(new_index);
+        while (it != _unassembled_segments.end()) {
             pushed_segment.push_back(it->second);
-            _unassembled_segments.erase(it++);
-            ++new_index;
+            _unassembled_segments.erase(it);
+            it = _unassembled_segments.find(++new_index);
         }
-        _output.write(pushed_segment);
+        _output.write(move(pushed_segment));
     }
 
     if (_eof && empty())
