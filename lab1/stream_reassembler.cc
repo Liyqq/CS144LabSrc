@@ -112,29 +112,6 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
 
     
     _unassembled_segments.erase(it, up_overlap_it);
-
-
-    // /* 利用map特性，合并重组子串 */
-    // size_t tmp_index = new_index;
-    // for (auto it : segment) {
-    //     _unassembled_segments.emplace(tmp_index, it);
-    //     ++tmp_index;
-    // }
-
-    // /* push重组的片段到_output中 */ 
-    // string pushed_segment;
-    // if (new_index == first_unassembled_index) {
-    //     auto it = _unassembled_segments.begin();
-    //     while ((it != _unassembled_segments.end()) && (it->first == new_index)) {
-    //         pushed_segment.push_back(it->second);
-    //         _unassembled_segments.erase(it++);
-    //         ++new_index;
-    //     }
-    //     _output.write(pushed_segment);
-    // }
-
-    // if (_eof && empty())
-    //     _output.end_input();
 }
 
 size_t StreamReassembler::unassembled_bytes() const { 
